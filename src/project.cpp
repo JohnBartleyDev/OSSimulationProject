@@ -7,7 +7,7 @@ int main(int argc, int argv[]){
 
     //general
     if (argc != 8){
-        std::cerr << "ERROR: Invalid number of inputs. Expected 8 but recieved " + argc + "\n";
+        std::cerr << "ERROR: Invalid number of inputs. Expected 8 but recieved " + argc + std::endl;
         return 1;
     }
 
@@ -15,7 +15,7 @@ int main(int argc, int argv[]){
     //number of processes to simulate, 0 < n <= 26
     int n = argv[1];
     if (n < 0 || n > 26){
-        std::cerr << "ERROR: Number of processes to simulate 'n' is of an invalid size: " + argc + "\n";
+        std::cerr << "ERROR: Number of processes to simulate 'n' is of an invalid size: " + argc + std::endl;
         return 1;
     }
     
