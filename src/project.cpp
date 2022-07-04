@@ -3,6 +3,7 @@
 
 int main(int argc, int argv[]){
     //INPUT processing
+    //sample input: a.out 8 101 0.001 16384 4 0.5 128 > output05-full.txt
 
     //general
     if (argc != 8){
