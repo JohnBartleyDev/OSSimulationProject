@@ -46,6 +46,9 @@ int main(int argc, int argv[]){
 
 
     //OUTPUT
+    // Format: Process <A>: arrival time <76>ms; tau <1000>ms; <9001> CPU bursts:
+    // Format: --> CPU burst <387>ms --> I/O burst <1190>ms
+
     // Format: time <t>ms: <event-details> [Q <queue-contents>]
     // Example: time 51476ms: Process B (tau 26ms) started using the CPU for 3ms burst [Q: empty]
 
