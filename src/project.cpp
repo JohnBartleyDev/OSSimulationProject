@@ -168,5 +168,13 @@ void srt() {
 // adding basic set up for individual algorithms
 // add variables as needed
 void rr() {
+    /*
+    
 
+    Completion Time: Time at which process completes its execution.
+    Turn Around Time: Time Difference between completion time and arrival time. Turn Around Time = Completion Time – Arrival Time
+    Waiting Time(W.T): Time Difference between turn around time and burst time. 
+    Waiting Time = Turn Around Time – Burst Time
+    https://www.geeksforgeeks.org/program-round-robin-scheduling-set-1/
+    */
 }
