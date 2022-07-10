@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
+#include <random> // may not need this
 
 /**
  * Generates an integer random number from an exponential distribution.
