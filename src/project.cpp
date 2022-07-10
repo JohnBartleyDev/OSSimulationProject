@@ -102,3 +102,23 @@ int next_exp(double lambda, int randomSeed, int floor, int cieling){
     //generate uniform distribution
     //project pdf identifies c function drand48
 }
+
+// adding basic set up for individual algorithms
+void fcfs() {
+    /*
+    Basic Algorithm:
+    Step 1 : Input the number of processes required to be scheduled using FCFS, burst time for each process and its arrival time.
+    Step 2 : Using enhanced bubble sort technique, sort the all given processes in ascending order according to arrival time in a ready queue.
+    Step 3 : Calculate the Finish Time, Turn Around Time and Waiting Time for each process which in turn help to calculate Average Waiting Time and Average Turn Around Time required by CPU to schedule given set of process using FCFS.
+        Step 3.1 : for i = 0, Finish Time T 0 = Arrival Time T 0 + Burst Time T 0
+        Step 3.2 : for i >= 1, Finish Time T i = Burst Time T i + Finish Time T i - 1
+        Step 3.3 : for i = 0, Turn Around Time T 0 = Finish Time T 0 - Arrival Time T 0
+        Step 3.4 : for i >= 1, Turn Around Time T i = Finish Time T i - Arrival Time T i
+        Step 3.5 : for i = 0, Waiting Time T 0 = Turn Around Time T 0 - Burst Time T 0
+        Step 3.6 : for i >= 1, Waiting Time T i = Turn Around Time T i - Burst Time T i - 1
+    Step 4 : Process with less arrival time comes first and gets scheduled first by the CPU.
+    Step 5 : Calculate the Average Waiting Time and Average Turn Around Time.
+    Step 6 : Stop.
+    https://iq.opengenus.org/first-come-first-serve-cpu-scheduling/#:~:text=First%20Come%20First%20Serve%20(FCFS,executed%20fully%20by%20the%20CPU.
+    */
+}
