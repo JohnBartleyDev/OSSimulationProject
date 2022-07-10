@@ -141,6 +141,7 @@ void sjf() {
         Completion Time = Start Time + Burst Time
         Turn Around Time = Completion Time – Arrival Time
         Waiting Time = Turn Around Time – Burst Time
+    https://www.geeksforgeeks.org/program-for-shortest-job-first-or-sjf-cpu-scheduling-set-1-non-preemptive/
     */
 }
 
@@ -148,7 +149,19 @@ void sjf() {
 // adding basic set up for individual algorithms
 // add variables as needed
 void srt() {
-
+    /*
+    Step 1 : Traverse until all process gets completely executed.
+        Step 1.1 : Find process with minimum remaining time at every single time lap.
+        Step 1.2 : Reduce its time by 1.
+        Step 1.3 : Check if its remaining time becomes 0 
+        Step 1.4 : Increment the counter of process completion.
+        Step 1.5 : Completion time of current process = current_time + 1;
+        Step 1.6 : Calculate waiting time for each completed process.
+            Step 1.61 : wt[i]= Completion time – arrival_time-burst_time
+        Step 1.7 : Increment time lap by one.
+    Step 2 : Find turnaround time (waiting_time + burst_time).
+    https://www.geeksforgeeks.org/shortest-remaining-time-first-preemptive-sjf-scheduling-algorithm/
+    */
 }
 
 // round robin
