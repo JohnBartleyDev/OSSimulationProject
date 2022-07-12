@@ -64,19 +64,20 @@ int main(int argc, int argv[]){
     //TODO: #1 Data structure to store CPU and I/O burst times.  Store them in pairs?  the last cpu burst has no I/O burst
 
     //generate process times, which will be used for each simulation
+    reseed(inputSeed);
     std::vector<Process> processes;
     for (int p = 0; p < n; p++) // p represents process.  P = 0 --> A
     {
         int bCount = next_uni(1, 100); //number of CPU bursts, a random integer between 1 and 100
-        int arrTime = 0; //arrival time in milliseconds.  UNIMPLEMENTED.
-        int tau = 0; //time in milliseconds.  UNIMPLEMENTED. XANDER: I don't know where this variable comes from, suspect Tcs
+        int arrTime = next_uni(1, 200);; //arrival time in milliseconds.  UNIMPLEMENTED.
+        int tau = 100; //time in milliseconds.  UNIMPLEMENTED. XANDER: I don't know where this variable comes from, suspect Tcs
         processes.push_back(Process(arrTime, tau, bCount));
         std::cout << "Process " << p + 'A' << ": arrival time " << arrTime << "ms; tau "
             << tau << "ms; " << bCount << " CPU bursts:" << std::endl;
         //loop through bCount-1 bursts, doing last burst outside loop
         for (int i = 0; i < bCount; i++){
             int cpuTime = next_exp(lambda, inputSeed, 1, 100);
-            int ioTime = next_exp(lambda, inputSeed, 1, 100);
+            int ioTime = 10 * next_exp(lambda, inputSeed, 1, 100);
             processes.back().addTimes(cpuTime, ioTime);
             std::cout << "--> CPU burst " << cpuTime << "ms --> I/O burst " << ioTime << "ms" << std::endl;
         }
@@ -88,6 +89,7 @@ int main(int argc, int argv[]){
     //0 = FCFS, 1 = SJF, 2 = SRT, 3 = RR
     for (int alg = 0; alg < 4; alg++) //TODO: #2 Ienumerator for algorithm?
     {
+        reseed(inputSeed);
         int time = 0;
         std::string algorithm;
         switch (alg)
@@ -105,6 +107,7 @@ int main(int argc, int argv[]){
             algorithm = "RR";
             break;
         }
+        //do algorithm
         std::cout << "time " << time << "ms: Simulator started for " << algorithm << " [Q: empty]" << std::endl;
         //while still jobs to do
             //pick next job
@@ -134,6 +137,12 @@ int next_uni(int floor, int cieling){
 
 int next_exp(double lambda, int floor, int cieling){
     //NON-FUNCTIONAL
+    /*To ensure predictability and repeatability, use srand48() with
+this given seed before simulating each scheduling algorithm and drand48() to obtain the
+next value in the range [0.0, 1.0). For languages that do not have these functions, implement
+an equivalent 48-bit linear congruential generator, as described in the man page for these
+functions in C.1 */
+
 }
 
 // first come first serve
