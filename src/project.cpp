@@ -1,7 +1,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
-#include <random> // may not need this
+#include <string>
+#include "simProcess.h"
 
 /**
  * Generates an integer random number from an exponential distribution.
@@ -63,19 +64,24 @@ int main(int argc, int argv[]){
     //TODO: #1 Data structure to store CPU and I/O burst times.  Store them in pairs?  the last cpu burst has no I/O burst
 
     //generate process times, which will be used for each simulation
+    std::vector<Process> processes;
     for (int p = 0; p < n; p++) // p represents process.  P = 0 --> A
     {
-        int bCount = next_exp(lambda, inputSeed, 1, 100); //number of CPU bursts, a random integer between 1 and 100
+        int bCount = next_uni(1, 100); //number of CPU bursts, a random integer between 1 and 100
         int arrTime = 0; //arrival time in milliseconds.  UNIMPLEMENTED.
         int tau = 0; //time in milliseconds.  UNIMPLEMENTED. XANDER: I don't know where this variable comes from, suspect Tcs
+        processes.push_back(Process(arrTime, tau, bCount));
         std::cout << "Process " << p + 'A' << ": arrival time " << arrTime << "ms; tau "
             << tau << "ms; " << bCount << " CPU bursts:" << std::endl;
         //loop through bCount-1 bursts, doing last burst outside loop
         for (int i = 0; i < bCount; i++){
             int cpuTime = next_exp(lambda, inputSeed, 1, 100);
             int ioTime = next_exp(lambda, inputSeed, 1, 100);
+            processes.back().addTimes(cpuTime, ioTime);
             std::cout << "--> CPU burst " << cpuTime << "ms --> I/O burst " << ioTime << "ms" << std::endl;
         }
+
+        int cpuTime = next_exp(lambda, inputSeed, 1, 100);
     }
 
     //loop through each algorithm
@@ -83,6 +89,22 @@ int main(int argc, int argv[]){
     for (int alg = 0; alg < 4; alg++) //TODO: #2 Ienumerator for algorithm?
     {
         int time = 0;
+        std::string algorithm;
+        switch (alg)
+        {
+        case 0:
+            algorithm = "FCFS";
+            break;
+        case 1:
+            algorithm = "SJF";
+            break;
+        case 2:
+            algorithm = "SRT";
+            break;
+        case 3:
+            algorithm = "RR";
+            break;
+        }
         std::cout << "time " << time << "ms: Simulator started for " << algorithm << " [Q: empty]" << std::endl;
         //while still jobs to do
             //pick next job
@@ -100,11 +122,18 @@ int main(int argc, int argv[]){
 
 }
 
-int next_exp(double lambda, int randomSeed, int floor, int cieling){
-    //NON-FUNCTIONAL
+void reseed(int seed){
+    std::srand(seed);
+}
 
-    //generate uniform distribution
-    //project pdf identifies c function drand48
+int next_uni(int floor, int cieling){
+    int random = std::rand();
+    int boundedRandom = random%(cieling-floor) + floor; //generate integer between cieling and floor from random
+    return boundedRandom;
+}
+
+int next_exp(double lambda, int floor, int cieling){
+    //NON-FUNCTIONAL
 }
 
 // first come first serve
