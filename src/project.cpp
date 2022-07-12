@@ -63,7 +63,7 @@ int main(int argc, int argv[]){
     //TODO: #1 Data structure to store CPU and I/O burst times.  Store them in pairs?  the last cpu burst has no I/O burst
 
     //generate process times, which will be used for each simulation
-    for (int p = 0; p < n; i++) // p represents process.  P = 0 --> A
+    for (int p = 0; p < n; p++) // p represents process.  P = 0 --> A
     {
         int bCount = next_exp(lambda, inputSeed, 1, 100); //number of CPU bursts, a random integer between 1 and 100
         int arrTime = 0; //arrival time in milliseconds.  UNIMPLEMENTED.
@@ -80,7 +80,7 @@ int main(int argc, int argv[]){
 
     //loop through each algorithm
     //0 = FCFS, 1 = SJF, 2 = SRT, 3 = RR
-    for (int alg = 0, alg < 4; alg++) //TODO: #2 Ienumerator for algorithm?
+    for (int alg = 0; alg < 4; alg++) //TODO: #2 Ienumerator for algorithm?
     {
         int time = 0;
         std::cout << "time " << time << "ms: Simulator started for " << algorithm << " [Q: empty]" << std::endl;
