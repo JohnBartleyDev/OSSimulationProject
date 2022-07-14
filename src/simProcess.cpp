@@ -65,7 +65,7 @@ int Process::getCurIO()
 {
     if (cur >= len - 1)
         return -1;
-    return cpuTimes[cur];
+    return ioTimes[cur];
 }
 
 //returns len
