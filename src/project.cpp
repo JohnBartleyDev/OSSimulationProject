@@ -353,7 +353,7 @@ void fcfs(std::vector<Process>& processes, int contexttime) {
 // adding basic set up for individual algorithms
 // add variables as needed
 void sjf() {
-    	std::cout << "beginning of SJF process" << std::endl;
+    std::cout << "beginning of SJF process" << std::endl;
 	// variable declaration
 	int currtime = 0;
     bool inprocess = true; // turns false when there are no processes in the ready, running, or waiting state 
