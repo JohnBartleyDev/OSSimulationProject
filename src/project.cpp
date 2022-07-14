@@ -353,6 +353,121 @@ void fcfs(std::vector<Process>& processes, int contexttime) {
 // adding basic set up for individual algorithms
 // add variables as needed
 void sjf() {
+    	std::cout << "beginning of SJF process" << std::endl;
+	// variable declaration
+	int currtime = 0;
+    bool inprocess = true; // turns false when there are no processes in the ready, running, or waiting state 
+    bool inuse = false;
+    int n = processes.size(); // the amount of processes
+
+    std::pair<int, char> wait[n];
+    std::vector<Process> ioState; //process objects in ioState
+    std::vector<Process> readyState; // Process objects in readyState do not reference the same objects as those in the processes argument, it is just a copy
+    std::vector<Process> runState;//vector container for holding only one process to keep the same modification methods
+    std::vector<Process>::iterator readyit;
+    std::vector<Process>::iterator ioit;
+    std::vector<int> eventlog;
+    //sorts and creates order for initial ready queue for processes
+    std::pair<int, char> burstarr[n];
+
+    double prevtau = 0;
+    double currtau = ceil(1/lambda);
+    double expaverage = 0; // Τn+1 = αtn + (1 - α)Τn 
+    
+    for(int i = 0; i< n; i++){
+        expaverage = prevtau * alpha + (1 - alpha) * prevtau;
+        burstarr[i].first = expaverage;
+
+        prevtau = currtime;
+        currtau = expaverage;
+
+        burstlarr[i].second = processes[i].getID();
+    }
+
+    // need to sort based on burst timw
+    std::sort(burstarr.first, (burstarr + n).first, compareBurst);
+    addevent(eventlog, burstarr[0].first);
+    //uses sorted burst time to begin ready state
+    int startsreached = 0;
+
+    //uses burst to begin ready state
+    int startsreached =0;
+    std::cout << "beginning of SJF process " << std::endl;
+    while(inprocess){
+        if(startsreached < n){
+            if(currtime >= burstarr[startsreached].first){
+                ioit =std::find_if(processes.begin(), processes.end(), std::bind(compareProcess, std::placeholders::_1, burstarr[startsreached].second));
+                readyState.push_back(*ioit);
+                startsreached +=1;
+                
+                std::cout<<"time "<<currtime<<"ms: Process "<<readyState[0].getID()<<" arrived; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
+                
+                continue;
+
+            }
+        }
+       
+       if (inuse == false){
+            if(readyState.size()!=0){
+                
+                currtime += contexttime / 2;
+                std::cout << "time " << currtime << "ms: Process " << readyState[0].getID() << " started using the CPU for " << readyState[0].getCurCPU() << "ms burst [Q:" << printQueue(readyState) << std::endl;
+                switchVector(readyState, runState, readyState[0].getID());
+                
+                inuse= true;
+
+                runState[0].addIOevent(runState[0].getCurCPU()+currtime);
+                continue;
+            }
+        }
+        
+        if(inuse == true) {
+            if(currtime >= runState[0].getNextIO()){
+                
+                
+                if(runState[0].getLen() - runState[0].getCur() <= 1){
+                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" Terminated [Q:"<<printQueue(readyState)<<std::endl;
+                    runState.erase(runState.begin());
+                    inuse = false;
+                    currtime +=contexttime/2;
+                    continue;
+                }
+                std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" completed a CPU burst; "<<runState[0].getLen()-runState[0].getCur()-1 <<"bursts to go "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
+                currtime += contexttime/2;
+                
+                runState[0].addIOevent(runState[0].getCurIO()+currtime);
+                
+                runState[0].nextP();
+                switchVector(runState, ioState, runState[0].getID());
+                
+                inuse = false;
+                
+                continue;
+            }
+        }
+
+        if(ioState.size()!= 0){
+            for (int i = 0; i< ioState.size(); i++){
+                if(currtime >= ioState[i].getNextIO()){
+                    switchVector(ioState, readyState, ioState[i].getID());
+                    std::cout<<"time "<<currtime<<"ms: Process "<<readyState[readyState.size()-1].getID()<<" completed I/O; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
+                   
+                    goto cnt;
+                }
+            }
+            
+        }
+        
+        if(ioState.size()==0 && readyState.size()==0 && runState.size()==0 &&startsreached ==n){
+             std::cout << "currtime is  "<<currtime<<" at end of progrma" << std::endl;
+            inprocess =false;
+            continue;
+        }
+      
+        
+        currtime+=1;
+        cnt:;
+    }
     /*
     Step 1 : Sort all the processes according to the arrival time. 
     Step 2 : Then select that process that has minimum arrival time and minimum Burst time. 
