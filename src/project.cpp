@@ -183,8 +183,8 @@ bool compareArrival(std::pair<int, char> p1, std::pair<int, char> p2){
 }
 
 // sort function based on burst time
-bool compareBurst(Process &p1, Process &p2) {
-    return (p1.getCurCPU() < p2.getCurCPU());
+bool compareBurst(int p1, int p2) {
+    return (p1 < p2);
 }
 
 //adds an event to the event log and resorts it with newest events first
