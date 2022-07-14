@@ -98,7 +98,8 @@ int main(int argc, char** argv){
         
         int bCount =  1+drand48()*100;//next_uni(1, 100); //number of CPU bursts, a random integer between 1 and 100
         ;//next_uni(1, 200);; //arrival time in milliseconds.  UNIMPLEMENTED.
-        int tau = 100; //time in milliseconds.  UNIMPLEMENTED. XANDER: I don't know where this variable comes from, suspect Tcs
+        int tau = ceil(1/lambda); //time in milliseconds.  UNIMPLEMENTED. XANDER: I don't know where this variable comes from, suspect Tcs
+        // tau =  ceil(1/lambda); --> this should be tau_0
         processes.push_back(Process(arrTime, tau, bCount, char(p+65)));
         std::cout << "Process " << p + 'A' << ": arrival time " << arrTime << "ms; tau "
             << tau << "ms; " << bCount << " CPU bursts:" << std::endl;
