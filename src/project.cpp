@@ -181,6 +181,11 @@ bool compareArrival(std::pair<int, char> p1, std::pair<int, char> p2){
     return (p1.first < p2.first);
 }
 
+// sort function based on burst time
+bool compareBurst(Process &p1, Process &p2) {
+    return (p1.getCurCPU() < p2.getCurCPU());
+}
+
 //adds an event to the event log and resorts it with newest events first
 void addevent(std::vector<int>&events, int event){
     //maybe write own sorting function
@@ -383,7 +388,7 @@ void srt() {
 // add variables as needed
 void rr() {
     /*
-    
+
 
     Completion Time: Time at which process completes its execution.
     Turn Around Time: Time Difference between completion time and arrival time. Turn Around Time = Completion Time – Arrival Time
