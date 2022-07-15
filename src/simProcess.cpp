@@ -23,7 +23,7 @@ Process::Process(int arrivalTime, int tau, int burstCount, char ident, double al
     totalburst = 0;
     len = burstCount;
     nextio =0;
-    waits = 0;
+    waits = 1;
     waittime = arrivalTime; 
 }
 
@@ -131,7 +131,7 @@ void Process::setWait(int currtime)
 //pushes next tau value for srt and sjf
 void Process::nextTau()
 {
-    tau = (cpuTimes[cur]*alpha) +(tau*alpha);
+    tau = 1+(cpuTimes[cur]*alpha) +(tau*(1-alpha));
 }
 void Process::addTimes(int CPUBurstTime, int IOBurstTime)
 {
