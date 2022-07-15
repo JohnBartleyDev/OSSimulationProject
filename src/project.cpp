@@ -39,8 +39,8 @@ int next_exp(double lambda, int cieling){
 }
 void fcfs(std::vector<Process> &processes, int contexttime); // first come first serve
 void sjf(std::vector<Process> &processes, int contexttime, double alpha, double lambda); // shortest job first
-void srt(); // shortest remaining time
-void rr(); // round robin
+void srt(std::vector<Process> &processes, int contexttime, double alpha, double lambda); // shortest remaining time
+void rr(std::vector<Process> &processes, int contexttime, double alpha, double lambda, int timeslice); // round robin
 
 int main(int argc, char** argv){
     //INPUT processing
@@ -88,6 +88,9 @@ int main(int argc, char** argv){
     //reseed(inputSeed);
      srand48(inputSeed);
     std::vector<Process> processes;
+    if (timeSlice > 1){
+        timeSlice = 1;
+    }
     for (int p = 0; p < n; p++) // p represents process.  P = 0 --> A
     {
         int arrTime = floor(next_exp(lambda, randomMax));
@@ -243,7 +246,7 @@ std::string printQueue(std::vector<Process>& v1)
         out = out.append(" empty");
     }
     else{
-        for(int i= 0; i<v1.size(); i++){
+        for(int i= 0; i<int(v1.size()); i++){
             out = out.append(" ");
             out +=v1[i].getID();
         }
@@ -269,7 +272,7 @@ void fcfs(std::vector<Process>& processes, int contexttime) {
     int contextSwitches = 0;
     int totalwaittime = 0;
     int totalwaits = 0;
-    std::pair<int, char> wait[n];
+    
     std::vector<Process> ioState; //process objects in ioState
     std::vector<Process> readyState; // Process objects in readyState do not reference the same objects as those in the processes argument, it is just a copy
     std::vector<Process> runState;//vector container for holding only one process to keep the same modification methods
@@ -350,7 +353,7 @@ void fcfs(std::vector<Process>& processes, int contexttime) {
                 }
             }
             if(ioState.size()!= 0){
-                for (int i = 0; i< ioState.size(); i++){
+                for (int i = 0; i< int(ioState.size()); i++){
                     if(currtime >= ioState[i].getNextIO()){
                         switchVector(ioState, readyState, ioState[i].getID());
                         std::cout<<"time "<<currtime<<"ms: Process "<<readyState[readyState.size()-1].getID()<<" completed I/O; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
@@ -394,7 +397,7 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
     bool inuse = false;
     int n = processes.size(); // the amount of processes
 
-    std::pair<int, char> wait[n];
+  
     std::vector<Process> ioState; //process objects in ioState
     std::vector<Process> readyState; // Process objects in readyState do not reference the same objects as those in the processes argument, it is just a copy
     std::vector<Process> runState;//vector container for holding only one process to keep the same modification methods
@@ -404,9 +407,7 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
     //sorts and creates order for initial ready queue for processes
     
     std::pair<int, char> arrivalarr[n];
-    double prevtau = 0;
-    double currtau = ceil(1/lambda);
-    double expaverage = 0; // Τn+1 = αtn + (1 - α)Τn 
+   
     
     for(int i = 0; i< n; i++){
         arrivalarr[i].first=processes[i].getArrival();
@@ -482,7 +483,7 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
         }
 
         if(ioState.size()!= 0){
-            for (int i = 0; i< ioState.size(); i++){
+            for (int i = 0; i< int(ioState.size()); i++){
                 if(currtime >= ioState[i].getNextIO()){
                     switchVectorsjf(ioState, readyState, ioState[i].getID());
                     std::cout<<"time "<<currtime<<"ms: Process "<<readyState[readyState.size()-1].getID()<<" completed I/O; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;

@@ -10,8 +10,8 @@ Process::Process()
 {
     len = 0;
     cur = 0;
-    int arrivalTime;
-    int tau;
+    arrivalTime =0;
+    tau =0;
 }
 
 Process::Process(int arrivalTime, int tau, int burstCount, char ident, double alpha){
@@ -38,7 +38,7 @@ Process::Process(std::vector<int> cpuTimes, std::vector<int> ioTimes)
 /** Returns CPU burst time at index.  Returns -1 if index is out of bounds  */
 int Process::getCPU(int index)
 {
-    if (index >= len)
+    if (index >= int(len))
         return -1;
     return cpuTimes[index];
 }
@@ -46,7 +46,7 @@ int Process::getCPU(int index)
 /** Returns IO burst time at index.  Returns -1 if index is out of bounds  */
 int Process::getIO(int index)
 {
-    if (index >= len - 1)
+    if (index >= int(len) - 1)
         return -1;
     return cpuTimes[index];
 }
@@ -59,7 +59,7 @@ int Process::getArrival(){
 /** Returns current CPU burst time.  Returns -1 if cur is out of bounds  */
 int Process::getCurCPU()
 {
-    if (cur >= len)
+    if (cur >= int(len))
         return -2;
     return cpuTimes[cur];
 }
@@ -67,7 +67,7 @@ int Process::getCurCPU()
 /** Returns current IO burst time.  Returns -1 if cur is out of bounds  */
 int Process::getCurIO()
 {
-    if (cur >= len - 1)
+    if (cur >= int(len) - 1)
         return -1;
     return ioTimes[cur];
 }
