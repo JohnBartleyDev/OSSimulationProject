@@ -241,6 +241,15 @@ void switchVectorsjf(std::vector<Process>& v2, std::vector<Process>& v1, char na
    
   
 }
+bool checkforduplicates(std::vector<Process>& v1, int currtime){
+
+    for(int i = 0; i <int(v1.size()); i++){
+        if(int(v1[i].getNextIO()) <= currtime){
+            return true;
+        } 
+    }
+    return false;
+}
 
 //formats the readyqueue for output
 std::string printQueue(std::vector<Process>& v1)
@@ -420,6 +429,9 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
     int contextSwitches = 0;
     int totalwaittime = 0;
     int totalwaits = 0;
+    bool contextflag = false;
+    int contexttimer =0;
+    
     
     std::vector<Process> ioState; //process objects in ioState
     std::vector<Process> readyState; // Process objects in readyState do not reference the same objects as those in the processes argument, it is just a copy
@@ -441,31 +453,22 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
     int startsreached =0;
      std::cout<<"time "<<currtime<<"ms: Simulator started for FCFS [Q:"<<printQueue(readyState)<<std::endl;
         while(inprocess){
-            if(startsreached < n){
-                if(currtime >= arrivalarr[startsreached].first){
-                    ioit =std::find_if(processes.begin(), processes.end(), std::bind(compareProcess, std::placeholders::_1, arrivalarr[startsreached].second));
-                    sjfReady(readyState, *ioit);
-                    startsreached +=1;
-                   if(30000>=currtime  && currtime>= 17000){
-                        std::cout<<(*ioit).getID()<<std::endl;
-                        std::cout<<"time "<<currtime<<"ms: Process "<<(*ioit).getID()<<" arrived; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
-                    }
-                     
-                     continue;
-
-                }
+            if(contextflag == true){
+                contexttimer -=1;
+                goto contextswitch;
             }
-           
+            
+          
            if (inuse == false){
                 if(readyState.size()!=0){
                     totalwaittime += currtime -readyState[0].getWait();
-                    currtime += contexttime/2;
+                    currtime += floor(contexttime/2);
                    
                     
                    
                     switchVector(readyState, runState, readyState[0].getID());
-                   if(30000>=currtime  && currtime>= 17000){
-                        std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" started using the CPU for "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
+                   if(1000>=currtime){
+                        std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" (tau "<<runState[0].getTau()<<") started using the CPU for "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
                     }
                     contextSwitches +=1;
                     inuse= true;
@@ -487,15 +490,18 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
                         runState.erase(runState.begin());
                         inuse = false;
                         
-                        currtime +=contexttime/2;
-                        continue;
+                         contextflag = true;
+                    contexttimer=contexttime/2;
+                        //std::cout<<"time "<<currtime<<"ms: going to contextswitch from emptyprocess"<<std::endl;
+                    goto contextswitch;
                     }
-                   if(30000>=currtime  && currtime>= 17000){
-                        std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" completed a CPU burst; "<<runState[0].getLen()-runState[0].getCur()-1 <<"bursts to go "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
+                  if(1000>=currtime){
+                        std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" (tau "<<runState[0].getTau()<<") completed a CPU burst; "<<runState[0].getLen()-runState[0].getCur()-1 <<"bursts to go "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
+                            std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" switching out of CPU; will block I/O untill time "<<runState[0].getCurIO()+(currtime+contexttime/2) <<"ms [Q:"<<printQueue(readyState)<<std::endl;
                     }
-                    currtime += contexttime/2;
                     
-                    runState[0].addIOevent(runState[0].getCurIO()+currtime);
+                    
+                    runState[0].addIOevent(runState[0].getCurIO()+currtime+contexttime/2);
                     runState[0].nextTau();
                     runState[0].nextP();
                     switchVector(runState, ioState, runState[0].getID());
@@ -503,33 +509,87 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
                     
                     inuse = false;
                     
-                    continue;
+                    contextflag = true;
+                    contexttimer=contexttime/2;
+                    //std::cout<<"time "<<currtime<<"ms: going to contextswitch from complete burst"<<std::endl;
+                    goto contextswitch;
+                    
+                   
                 }
             }
+            contextswitch:;
+            // if(currtime<1000){
+            //     std::cout<<"time "<<currtime<<"ms: reached contextswitch"<<std::endl;
+            // }
             if(ioState.size()!= 0){
                 for (int i = 0; i< int(ioState.size()); i++){
                     if(currtime >= ioState[i].getNextIO()){
                         ioState[i].setWait(currtime);
-                   if(30000>=currtime  && currtime>= 17000){
-                            std::cout<<"time "<<currtime<<"ms: Process "<<ioState[i].getID()<<" (tau " <<ioState[i].getTau()<<") completed I/O; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
+                   
+                            char id = ioState[i].getID();
+                            int taul = ioState[i].getTau();
+                            switchVectorsjf(ioState, readyState, ioState[i].getID());
+                        if(1000>=currtime){
+                            std::cout<<"time "<<currtime<<"ms: Process "<<id<<" (tau " <<taul<<") completed I/O; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
                         }
-                        switchVectorsjf(ioState, readyState, ioState[i].getID());
-                       
-                        goto cnt;
+                        
+                        if (checkforduplicates(ioState, currtime) == true){
+                            goto contextswitch;
+                        }
+                        if(contextflag ==true){
+                             //std::cout<<"time "<<currtime<<"ms: going to contextswitch from i/ocompletet"<<std::endl;
+                            goto contextswitch;
+                        }
+                        else{
+                          goto skip;
+                        }
                     }
                 }
                 
+                
+            }
+
+            if(startsreached < n){
+                if(currtime >= arrivalarr[startsreached].first){
+                    ioit =std::find_if(processes.begin(), processes.end(), std::bind(compareProcess, std::placeholders::_1, arrivalarr[startsreached].second));
+                    sjfReady(readyState, *ioit);
+                    startsreached +=1;
+                  if(1000>=currtime){
+                        //std::cout<<(*ioit).getID()<<std::endl;
+                        std::cout<<"time "<<currtime<<"ms: Process "<<(*ioit).getID()<<" arrived; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
+                    }
+                    if(contextflag ==true){
+                        goto contextswitch;
+                    }
+                    else{
+                        goto skip;
+                    }
+
+                }
             }
             
             if(ioState.size()==0 && readyState.size()==0 && runState.size()==0 &&startsreached ==n){
-                std::cout << "time "<<currtime<<"ms: Simulator ended for FCFS" << std::endl;
+                std::cout << "time "<<currtime+contexttime/2<<"ms: Simulator ended for FCFS" << std::endl;
                 inprocess =false;
                 continue;
             }
           
-            
-            currtime+=1;
-            cnt:;
+
+
+           
+            if(contextflag == true)
+            {
+                if(contexttimer >0){
+                    currtime+=1;
+                    continue; 
+                }
+                if(contexttimer <=0){
+                    contextflag = false;
+                    continue;
+                }
+            }
+         currtime+=1;
+         skip:;
     }
     double avgBurst = (double)totalcputime/(double)contextSwitches;
     //std::cout<<totalcputime<<" "<<contextSwitches<<" " <<std::setprecision(5)<<avgBurst<<std::endl;
