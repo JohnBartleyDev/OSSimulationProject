@@ -268,6 +268,22 @@ std::string printQueue(std::vector<Process>& v1)
     return out;
 }
 
+// checks if premption occured
+bool rrPrempted(std::vector<Process> readyState, int currtime, char ID, int currIO, int currtslice) {
+    if (currtslice < currIO) {
+        // no context switch if nothing in queue
+        // should switch to next process if queue has more things in it
+        if (readyState.size() == 0) {
+            std::cout << "time " << currtime << "ms: Time slice expired; no preemption because ready queue is empty [Q: empty]" << std::endl;
+        } else {
+            std::cout << "time " << currIO << "ms: Time slice expired; process " << ID << " preempted with " << currtime << "remaining " << printQueue(readyState) << std::endl;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 // first come first serve
 // adding basic set up for individual algorithms
 // add variables as needed
