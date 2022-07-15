@@ -458,7 +458,7 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
                     ioit =std::find_if(processes.begin(), processes.end(), std::bind(compareProcess, std::placeholders::_1, arrivalarr[startsreached].second));
                     sjfReady(readyState, *ioit);
                     startsreached +=1;
-                    if(currtime<= 999){
+                   if(30000>=currtime  && currtime>= 17000){
                         std::cout<<(*ioit).getID()<<std::endl;
                         std::cout<<"time "<<currtime<<"ms: Process "<<(*ioit).getID()<<" arrived; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
                     }
@@ -476,7 +476,7 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
                     
                    
                     switchVector(readyState, runState, readyState[0].getID());
-                     if(currtime<= 999){
+                   if(30000>=currtime  && currtime>= 17000){
                         std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" started using the CPU for "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
                     }
                     contextSwitches +=1;
@@ -502,7 +502,7 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
                         currtime +=contexttime/2;
                         continue;
                     }
-                    if(currtime<= 999){
+                   if(30000>=currtime  && currtime>= 17000){
                         std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" completed a CPU burst; "<<runState[0].getLen()-runState[0].getCur()-1 <<"bursts to go "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
                     }
                     currtime += contexttime/2;
@@ -522,7 +522,7 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
                 for (int i = 0; i< int(ioState.size()); i++){
                     if(currtime >= ioState[i].getNextIO()){
                         ioState[i].setWait(currtime);
-                         if(currtime<= 999){
+                   if(30000>=currtime  && currtime>= 17000){
                             std::cout<<"time "<<currtime<<"ms: Process "<<ioState[i].getID()<<" (tau " <<ioState[i].getTau()<<") completed I/O; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
                         }
                         switchVectorsjf(ioState, readyState, ioState[i].getID());
