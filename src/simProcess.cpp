@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <vector>
 #include <string>
+#include <math.h>
 
 // constructors
 Process::Process()
@@ -131,7 +132,7 @@ void Process::setWait(int currtime)
 //pushes next tau value for srt and sjf
 void Process::nextTau()
 {
-    tau = 1+(cpuTimes[cur]*alpha) +(tau*(1-alpha));
+    tau = ceil((cpuTimes[cur]*alpha) +(tau*(1-alpha)));
 }
 void Process::addTimes(int CPUBurstTime, int IOBurstTime)
 {
