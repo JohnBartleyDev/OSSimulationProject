@@ -645,14 +645,144 @@ void srt() {
 // round robin
 // adding basic set up for individual algorithms
 // add variables as needed
-void rr() {
-    /*
-    
+void rr(std::vector<Process>& processes, int contexttime, int tslice) {
+    std::cout << "beginning of RR process" << std::endl;
+    // variable declaration
+    int currtime = 0;
+    int currtslice = 0; // current slice being used
+    bool inprocess = true; // turns false when there are no processes in the ready, running, or waiting state 
+    bool inuse = false;
+    bool prempted = false;
+    int n = processes.size(); // the amount of processes
 
-    Completion Time: Time at which process completes its execution.
-    Turn Around Time: Time Difference between completion time and arrival time. Turn Around Time = Completion Time – Arrival Time
-    Waiting Time(W.T): Time Difference between turn around time and burst time. 
-    Waiting Time = Turn Around Time – Burst Time
-    https://www.geeksforgeeks.org/program-round-robin-scheduling-set-1/
-    */
+    std::pair<int, char> wait[n];
+    std::vector<Process> ioState; //process objects in ioState
+    std::vector<Process> readyState; // Process objects in readyState do not reference the same objects as those in the processes argument, it is just a copy
+    std::vector<Process> runState;//vector container for holding only one process to keep the same modification methods
+    std::vector<Process>::iterator readyit;
+    std::vector<Process>::iterator ioit;
+    std::vector<int> eventlog;
+
+    //sorts and creates order for initial ready queue for processes
+    std::pair<int, char> arrivalarr[n];
+    
+    
+    for(int i = 0; i< n; i++){
+        arrivalarr[i].first=processes[i].getArrival();
+        arrivalarr[i].second=processes[i].getID();
+    }
+    std::sort(arrivalarr, arrivalarr+n, compareArrival);
+
+    currtslice += tslice;
+
+    //uses burst to begin ready state
+    int startsreached = 0;
+    while (inprocess) {
+        // must add process back into queue if it does not meet timeslice
+        if(startsreached < n){
+            if(currtime >= arrivalarr[startsreached].first){
+                ioit =std::find_if(processes.begin(), processes.end(), std::bind(compareProcess, std::placeholders::_1, arrivalarr[startsreached].second));
+                readyState.push_back(*ioit);
+                startsreached +=1;
+                if(currtime<= 999){
+                    std::cout<<"time "<<currtime<<"ms: Process "<<readyState[readyState.size()-1].getID()<<" arrived; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
+                }
+                 
+                 continue;
+
+            }
+        }
+
+        // updates currtslice
+        if (currtslice < currtime) {
+            currtslice += tslice;
+        }
+
+        prempted = rrPrempted(readyState, currtime, runState[0].getID(), runState[0].getCurIO(), currtslice);
+
+            if (prempted == true) {
+                // go to next value
+                prempted = false;
+                goto cnt;
+                // continue;
+            }
+
+       
+       if (inuse == false){
+            
+
+            if(readyState.size()!=0){
+                totalwaittime += currtime - readyState[0].getWait();
+                currtime += contexttime/2;
+               
+                
+               
+                switchVector(readyState, runState, readyState[0].getID());
+                 if(currtime<= 999){
+                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" started using the CPU for "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
+                }
+                contextSwitches +=1;
+                inuse= true;
+                
+               
+                runState[0].addIOevent(runState[0].getCurCPU()+currtime);
+                continue;
+            }
+        }
+        
+        if(inuse == true) {
+            if(currtime >= runState[0].getNextIO()){
+                
+                
+                if(runState[0].getLen()-runState[0].getCur() <=1){
+                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" Terminated [Q:"<<printQueue(readyState)<<std::endl;
+                    totalcputime += runState[0].getAvgBurst()+runState[0].getCurCPU();
+                    totalwaits +=runState[0].getWaits();
+                    // runState.erase(runState.begin()); --> need to add premption
+
+                    inuse = false;
+                    
+                    currtime +=contexttime/2;
+                    continue;
+                }
+                if(currtime<= 999){
+                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" completed a CPU burst; "<<runState[0].getLen()-runState[0].getCur()-1 <<"bursts to go "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
+                }
+                currtime += contexttime/2;
+                
+                runState[0].addIOevent(runState[0].getCurIO()+currtime);
+                
+                runState[0].nextP();
+                switchVector(runState, ioState, runState[0].getID());
+                
+                
+                inuse = false;
+                
+                continue;
+            }
+        }
+        if(ioState.size()!= 0){
+            for (int i = 0; i< int(ioState.size()); i++){
+                if(currtime >= ioState[i].getNextIO()){
+                    ioState[i].setWait(currtime);
+                    switchVector(ioState, readyState, ioState[i].getID());
+                    if(currtime<= 999){
+                        std::cout<<"time "<<currtime<<"ms: Process "<<readyState[readyState.size()-1].getID()<<" completed I/O; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
+                    }
+                    goto cnt;
+                }
+            }
+            
+        }
+        
+        if(ioState.size()==0 && readyState.size()==0 && runState.size()==0 &&startsreached ==n){
+            std::cout << "time " << currtime << "ms: Simulator ended for RR" << std::endl;
+            inprocess =false;
+            continue;
+        }
+      
+        prempted = false;
+        currtime+=1;
+        cnt:;
+    }
 }
