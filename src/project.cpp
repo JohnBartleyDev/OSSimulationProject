@@ -10,6 +10,7 @@
 #include <math.h>
 #include <unistd.h>
 #include <time.h>
+#include <fstream>
 
 /**
  * Generates an integer random number from an exponential distribution.
@@ -33,16 +34,11 @@ int next_exp(double lambda, int cieling){
     }
     return int(x);
     
-    //NON-FUNCTIONAL
-    /*To ensure predictability and repeatability, use srand48() with
-this given seed before simulating each scheduling algorithm and drand48() to obtain the
-next value in the range [0.0, 1.0). For languages that do not have these functions, implement
-an equivalent 48-bit linear congruential generator, as described in the man page for these
-functions in C.1 */
+   
 
 }
 void fcfs(std::vector<Process> &processes, int contexttime); // first come first serve
-void sjf(); // shortest job first
+void sjf(std::vector<Process> &processes, int contexttime, double alpha, double lambda); // shortest job first
 void srt(); // shortest remaining time
 void rr(); // round robin
 
@@ -100,7 +96,7 @@ int main(int argc, char** argv){
         ;//next_uni(1, 200);; //arrival time in milliseconds.  UNIMPLEMENTED.
         int tau = ceil(1/lambda); //time in milliseconds.  UNIMPLEMENTED. XANDER: I don't know where this variable comes from, suspect Tcs
         // tau =  ceil(1/lambda); --> this should be tau_0
-        processes.push_back(Process(arrTime, tau, bCount, char(p+65)));
+        processes.push_back(Process(arrTime, tau, bCount, char(p+65), alpha));
         std::cout << "Process " << p + 'A' << ": arrival time " << arrTime << "ms; tau "
             << tau << "ms; " << bCount << " CPU bursts:" << std::endl;
         //loop through bCount-1 bursts, doing last burst outside loop
@@ -133,6 +129,7 @@ int main(int argc, char** argv){
             break;
         case 1:
             algorithm = "SJF";
+            sjf(processes, csTime, alpha, lambda);
             break;
         case 2:
             algorithm = "SRT";
@@ -183,8 +180,8 @@ bool compareArrival(std::pair<int, char> p1, std::pair<int, char> p2){
 }
 
 // sort function based on burst time
-bool compareBurst(int p1, int p2) {
-    return (p1 < p2);
+bool compareBurst(std::pair<int, char> p1, std::pair<int, char> p2) {
+   return (p1.first < p2.first);
 }
 
 //adds an event to the event log and resorts it with newest events first
@@ -199,6 +196,42 @@ void switchVector(std::vector<Process>& v1, std::vector<Process>& v2, char name)
 {
   std::vector<Process>::iterator it =std::find_if(v1.begin(), v1.end(), std::bind(compareProcess, std::placeholders::_1, name));
   v2.push_back(*it);
+  v1.erase(it);
+}
+
+
+
+int sjfReady(std::vector<Process>& v1, Process p1)
+{
+    if(v1.size()==0){
+        v1.push_back(p1);
+        return 0;
+    }
+    else{
+        for (int i = v1.size()-1; i>=0; i--){
+            if(i ==0){
+                if(p1.getTau()>v1[0].getTau()){
+                    v1.insert(v1.begin(), p1);
+                    return 0;
+                }
+                else{
+                    v1.insert(v1.begin()+1, p1);
+                    return 1;
+                }
+            }
+            if (p1.getTau() < v1[i].getTau()){
+                v1.insert(v1.begin()+i+1, p1);
+                return i+1; 
+            }
+        }
+    }
+    return -1;
+}
+
+void switchVectorsjf(std::vector<Process>& v1, std::vector<Process>& v2, char name)
+{
+  std::vector<Process>::iterator it =std::find_if(v1.begin(), v1.end(), std::bind(compareProcess, std::placeholders::_1, name));
+  sjfReady(v2, *it);
   v1.erase(it);
 }
 
@@ -223,20 +256,26 @@ std::string printQueue(std::vector<Process>& v1)
 // adding basic set up for individual algorithms
 // add variables as needed
 void fcfs(std::vector<Process>& processes, int contexttime) {
+
     std::cout << "beginning of FCFS process " << std::endl;
+    std::ofstream outfile;
+    outfile.open("simout.txt", std::ios::app);
     //variable declarations
     int currtime = 0;
     bool inprocess = true; //turns false when there are no processes in the ready, running, or waiting state 
     bool inuse =false;
     int n = processes.size(); //the amount of processes
-    
+    int totalcputime =0;
+    int contextSwitches = 0;
+    int totalwaittime = 0;
+    int totalwaits = 0;
     std::pair<int, char> wait[n];
     std::vector<Process> ioState; //process objects in ioState
     std::vector<Process> readyState; // Process objects in readyState do not reference the same objects as those in the processes argument, it is just a copy
     std::vector<Process> runState;//vector container for holding only one process to keep the same modification methods
     std::vector<Process>::iterator readyit;
     std::vector<Process>::iterator ioit;
-    std::vector<int> eventlog;
+  
     //sorts and creates order for initial ready queue for processes
     std::pair<int, char> arrivalarr[n];
     
@@ -246,7 +285,7 @@ void fcfs(std::vector<Process>& processes, int contexttime) {
         arrivalarr[i].second=processes[i].getID();
     }
     std::sort(arrivalarr, arrivalarr+n, compareArrival);
-    addevent(eventlog, arrivalarr[0].first);
+  
     //uses sorted arrival time to begin ready state
     int startsreached =0;
      std::cout << "beginning of FCFS process " << std::endl;
@@ -270,12 +309,10 @@ void fcfs(std::vector<Process>& processes, int contexttime) {
                     
                     currtime += contexttime/2;
                     std::cout<<"time "<<currtime<<"ms: Process "<<readyState[0].getID()<<" started using the CPU for "<<readyState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
+                    totalwaittime += currtime -readyState[0].getWait();
+                    readyState[0].setWait(currtime);
                     switchVector(readyState, runState, readyState[0].getID());
-                    
-                
-                    
-                    
-                    
+                    contextSwitches +=1;
                     inuse= true;
                     
                    
@@ -290,8 +327,11 @@ void fcfs(std::vector<Process>& processes, int contexttime) {
                     
                     if(runState[0].getLen()-runState[0].getCur() <=1){
                         std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" Terminated [Q:"<<printQueue(readyState)<<std::endl;
+                        totalcputime += runState[0].getAvgBurst()+runState[0].getCurCPU();
+                        totalwaits +=runState[0].getWaits();
                         runState.erase(runState.begin());
                         inuse = false;
+                        
                         currtime +=contexttime/2;
                         continue;
                     }
@@ -331,28 +371,22 @@ void fcfs(std::vector<Process>& processes, int contexttime) {
             currtime+=1;
             cnt:;
     }
-    /*
-    Basic Algorithm:
-    Step 1 : Input the number of processes required to be scheduled using FCFS, burst time for each process and its arrival time.
-    Step 2 : Using enhanced bubble sort technique, sort the all given processes in ascending order according to arrival time in a ready queue.
-    Step 3 : Calculate the Finish Time, Turn Around Time and Waiting Time for each process which in turn help to calculate Average Waiting Time and Average Turn Around Time required by CPU to schedule given set of process using FCFS.
-        Step 3.1 : for i = 0, Finish Time T 0 = Arrival Time T 0 + Burst Time T 0
-        Step 3.2 : for i >= 1, Finish Time T i = Burst Time T i + Finish Time T i - 1
-        Step 3.3 : for i = 0, Turn Around Time T 0 = Finish Time T 0 - Arrival Time T 0
-        Step 3.4 : for i >= 1, Turn Around Time T i = Finish Time T i - Arrival Time T i
-        Step 3.5 : for i = 0, Waiting Time T 0 = Turn Around Time T 0 - Burst Time T 0
-        Step 3.6 : for i >= 1, Waiting Time T i = Turn Around Time T i - Burst Time T i - 1
-    Step 4 : Process with less arrival time comes first and gets scheduled first by the CPU.
-    Step 5 : Calculate the Average Waiting Time and Average Turn Around Time.
-    Step 6 : Stop.
-    https://iq.opengenus.org/first-come-first-serve-cpu-scheduling/#:~:text=First%20Come%20First%20Serve%20(FCFS,executed%20fully%20by%20the%20CPU.
-    */
+    double avgBurst = (double)totalcputime/(double)contextSwitches;
+    // std::cout<<totalcputime<<" "<<contextSwitches<<" " <<std::setprecision(5)<<avgBurst<<std::endl;
+    avgBurst = (ceil(avgBurst*1000) )/1000;
+    double avgWait = (double)totalwaittime/(double)totalwaits;
+    std::cout<<totalwaits<<" "<<totalwaittime<<" " <<std::setprecision(5)<<avgWait<<std::endl;
+    std::cout<<avgWait<<std::endl;
+    outfile <<"Algorithm FCFS\n";
+    outfile<<"-- average CPU burst time: " <<std::fixed<< std::setprecision(3)<<avgBurst<<" ms"<<std::endl;
+    outfile<<"-- average wait time: " <<std::fixed<< std::setprecision(3)<<avgWait<<" ms"<<std::endl;
+    outfile.close();
 }
 
 // shortest job first
 // adding basic set up for individual algorithms
 // add variables as needed
-void sjf() {
+void sjf(std::vector<Process>& processes, int contexttime, double alpha, double lambda) {
     std::cout << "beginning of SJF process" << std::endl;
 	// variable declaration
 	int currtime = 0;
@@ -366,41 +400,38 @@ void sjf() {
     std::vector<Process> runState;//vector container for holding only one process to keep the same modification methods
     std::vector<Process>::iterator readyit;
     std::vector<Process>::iterator ioit;
-    std::vector<int> eventlog;
+   
     //sorts and creates order for initial ready queue for processes
-    std::pair<int, char> burstarr[n];
-
+    
+    std::pair<int, char> arrivalarr[n];
     double prevtau = 0;
     double currtau = ceil(1/lambda);
     double expaverage = 0; // Τn+1 = αtn + (1 - α)Τn 
     
     for(int i = 0; i< n; i++){
-        expaverage = prevtau * alpha + (1 - alpha) * prevtau;
-        burstarr[i].first = expaverage;
-
-        prevtau = currtime;
-        currtau = expaverage;
-
-        burstlarr[i].second = processes[i].getID();
+        arrivalarr[i].first=processes[i].getArrival();
+        arrivalarr[i].second=processes[i].getID();
     }
 
+
     // need to sort based on burst timw
-    std::sort(burstarr.first, (burstarr + n).first, compareBurst);
-    addevent(eventlog, burstarr[0].first);
+    std::sort(arrivalarr, arrivalarr+n, compareBurst);
+  
     //uses sorted burst time to begin ready state
     int startsreached = 0;
 
     //uses burst to begin ready state
-    int startsreached =0;
+   
     std::cout << "beginning of SJF process " << std::endl;
     while(inprocess){
         if(startsreached < n){
-            if(currtime >= burstarr[startsreached].first){
-                ioit =std::find_if(processes.begin(), processes.end(), std::bind(compareProcess, std::placeholders::_1, burstarr[startsreached].second));
-                readyState.push_back(*ioit);
+            if(currtime >= arrivalarr[startsreached].first){
+                
+                ioit =std::find_if(processes.begin(), processes.end(), std::bind(compareProcess, std::placeholders::_1, arrivalarr[startsreached].second));
+                int pos = sjfReady(readyState, *ioit);
                 startsreached +=1;
                 
-                std::cout<<"time "<<currtime<<"ms: Process "<<readyState[0].getID()<<" arrived; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
+                std::cout<<"time "<<currtime<<"ms: Process "<<readyState[pos].getID()<<" arrived; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
                 
                 continue;
 
@@ -436,7 +467,11 @@ void sjf() {
                 currtime += contexttime/2;
                 
                 runState[0].addIOevent(runState[0].getCurIO()+currtime);
+                int oldtau = runState[0].getTau();
+                runState[0].nextTau();
+                std::cout<<"time "<<currtime-contexttime/2<<"ms: Recalculated tau for Process "<<runState[0].getID()<<": old tau "<<oldtau+1<<"ms; new tau "<<runState[0].getTau()<<"ms [Q:"<<printQueue(readyState)<<std::endl;
                 
+                //time 4889ms: Recalculated tau for process A: old tau 97ms; new tau 51ms [Q: empty]
                 runState[0].nextP();
                 switchVector(runState, ioState, runState[0].getID());
                 
@@ -449,7 +484,7 @@ void sjf() {
         if(ioState.size()!= 0){
             for (int i = 0; i< ioState.size(); i++){
                 if(currtime >= ioState[i].getNextIO()){
-                    switchVector(ioState, readyState, ioState[i].getID());
+                    switchVectorsjf(ioState, readyState, ioState[i].getID());
                     std::cout<<"time "<<currtime<<"ms: Process "<<readyState[readyState.size()-1].getID()<<" completed I/O; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
                    
                     goto cnt;
@@ -504,7 +539,7 @@ void srt() {
 // add variables as needed
 void rr() {
     /*
-
+    
 
     Completion Time: Time at which process completes its execution.
     Turn Around Time: Time Difference between completion time and arrival time. Turn Around Time = Completion Time – Arrival Time

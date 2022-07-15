@@ -14,13 +14,17 @@ Process::Process()
     int tau;
 }
 
-Process::Process(int arrivalTime, int tau, int burstCount, char ident){
+Process::Process(int arrivalTime, int tau, int burstCount, char ident, double alpha){
     this->arrivalTime = arrivalTime;
     this->tau = tau;
     this->ident = ident;
+    this-> alpha = alpha;
     cur = 0;
+    totalburst = 0;
     len = burstCount;
     nextio =0;
+    waits = 0;
+    waittime = arrivalTime; 
 }
 
 Process::Process(std::vector<int> cpuTimes, std::vector<int> ioTimes)
@@ -86,17 +90,49 @@ int Process::getNextIO()
     return nextio;
 }
 
+//Returns current tau value
+int Process::getTau()
+{
+    return tau;
+}
+
+
 int Process::getCur()
 {
     return cur;
 }
 
+double Process::getAvgBurst()
+{
+    return totalburst;
+}
+
+int Process::getWait()
+{
+    return waittime;
+}
+
+int Process::getWaits()
+{
+    return waits;
+}
 /** move current to the next set of bursts down the line in the process */
 void Process::nextP()
 {
+    totalburst+=cpuTimes[cur];
     cur++;
 }
 
+void Process::setWait(int currtime)
+{
+    waittime = currtime;
+    waits+=1;
+}
+//pushes next tau value for srt and sjf
+void Process::nextTau()
+{
+    tau = (cpuTimes[cur]*alpha) +(tau*alpha);
+}
 void Process::addTimes(int CPUBurstTime, int IOBurstTime)
 {
     cpuTimes.push_back(CPUBurstTime);
