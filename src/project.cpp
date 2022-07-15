@@ -40,7 +40,7 @@ int next_exp(double lambda, int cieling){
 void fcfs(std::vector<Process> &processes, int contexttime); // first come first serve
 void sjf(std::vector<Process> &processes, int contexttime, double alpha, double lambda); // shortest job first
 void srt(std::vector<Process> &processes, int contexttime, double alpha, double lambda); // shortest remaining time
-void rr(std::vector<Process> &processes, int contexttime, double alpha, double lambda, int timeslice); // round robin
+void rr(std::vector<Process> &processes, int contexttime, int tslice); // round robin // double alpha, double lambda, 
 
 int main(int argc, char** argv){
     //INPUT processing
