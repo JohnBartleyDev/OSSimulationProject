@@ -157,18 +157,6 @@ int main(int argc, char** argv){
 
 }
 
-void reseed(int seed){
-    std::srand(seed);
-}
-
-int next_uni(int floor, int cieling){
-    int random = std::rand();
-    int boundedRandom = random%(cieling-floor) + floor; //generate integer between cieling and floor from random
-    return boundedRandom;
-}
-
-
-
 //comparator function for using find_if
 bool compareProcess(Process &p1, char x)
 {
@@ -405,12 +393,12 @@ void fcfs(std::vector<Process>& processes, int contexttime) {
     //std::cout<<totalwaits<<" "<<totalwaittime<<" " <<std::setprecision(5)<<avgWait<<std::endl;
     double cpuUtil =100*(1-((double)(currtime-totalcputime-totalwaittime)/(double)currtime));
     //std::cout<<avgWait<<std::endl;
-    outfile <<"Algorithm FCFS\n";
-    outfile<<"-- average CPU burst time: " <<std::fixed<< std::setprecision(3)<<avgBurst<<" ms"<<std::endl;
-    outfile<<"-- average wait time: " <<std::fixed<< std::setprecision(3)<<avgWait<<" ms"<<std::endl;
-    outfile<<"-- average turnaround time: " <<std::fixed<< std::setprecision(3)<<avgWait+avgBurst+contexttime<<" ms"<<std::endl;
-    outfile<<"-- total number of preemptions : 0" <<std::endl;
-    outfile<<"-- CPU utilization: " <<std::fixed<< std::setprecision(3)<<cpuUtil<<"%"<<std::endl;
+    outfile << "Algorithm FCFS\n";
+    outfile << "-- average CPU burst time: " << std::fixed << std::setprecision(3) << avgBurst << " ms" << std::endl;
+    outfile << "-- average wait time: " << std::fixed << std::setprecision(3) << avgWait << " ms" << std::endl;
+    outfile << "-- average turnaround time: " << std::fixed << std::setprecision(3) << avgWait + avgBurst + contexttime << " ms" << std::endl;
+    outfile << "-- total number of preemptions : 0" << std::endl;
+    outfile << "-- CPU utilization: " << std::fixed << std::setprecision(3) << cpuUtil << "%" << std::endl;
     outfile.close();
 }
 
