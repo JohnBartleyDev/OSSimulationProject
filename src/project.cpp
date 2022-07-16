@@ -580,7 +580,7 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
                 startsreached +=1;
                 if(1000>=currtime){
                     //std::cout<<(*ioit).getID()<<std::endl;
-                    std::cout<<"time "<<currtime<<"ms: Process "<<(*ioit).getID()<<" arrived; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
+                    std::cout<<"time "<<currtime<<"ms: Process "<<(*ioit).getID()<< " (tau " << (*ioit).getTau() << "ms) arrived; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
                 }
                 if(contextflag ==true){
                     goto contextswitch;
@@ -799,7 +799,7 @@ void srt(std::vector<Process> &processes, int contexttime, double alpha, double 
                 if (1000 >= currtime)
                 {
                     // std::cout<<(*ioit).getID()<<std::endl;
-                    std::cout << "time " << currtime << "ms: Process " << (*ioit).getID() << " arrived; added to ready queue [Q:" << printQueue(readyState) << std::endl;
+                    std::cout<<"time "<<currtime<<"ms: Process "<<(*ioit).getID()<< " (tau " << (*ioit).getTau() << "ms) arrived; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
                 }
                 if (contextflag == true)
                 {
