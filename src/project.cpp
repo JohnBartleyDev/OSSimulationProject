@@ -851,6 +851,7 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
     bool inuse = false;
     bool prempted = false;
     int n = processes.size(); // the amount of processes
+    int premptions = 0; // keeps track of number of premptions
 
     std::pair<int, char> wait[n];
     std::vector<Process> ioState; //process objects in ioState
@@ -900,6 +901,7 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
         if (prempted == true) {
             // go to next value
             prempted = false;
+            premptions += 1;
             goto cnt;
             // continue;
         }
@@ -1001,4 +1003,19 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
             currtslice += tslice;
         }
     }
+
+    double avgBurst = (double)totalcputime/(double)contextSwitches;
+    //std::cout<<totalcputime<<" "<<contextSwitches<<" " <<std::setprecision(5)<<avgBurst<<std::endl;
+    avgBurst = (ceil(avgBurst*1000) )/1000;
+    double avgWait = (double)totalwaittime/(double)totalwaits;
+    //std::cout<<totalwaits<<" "<<totalwaittime<<" " <<std::setprecision(5)<<avgWait<<std::endl;
+    double cpuUtil =100*(1-((double)(currtime-totalcputime-totalwaittime)/(double)currtime));
+
+    outfile <<"Algorithm RR\n";
+    outfile<<"-- average CPU burst time: " <<std::fixed<< std::setprecision(3)<<avgBurst<<" ms"<<std::endl;
+    outfile<<"-- average wait time: " <<std::fixed<< std::setprecision(3)<<avgWait<<" ms"<<std::endl;
+    outfile<<"-- average turnaround time: " <<std::fixed<< std::setprecision(3)<<avgWait+avgBurst+contexttime<<" ms"<<std::endl;
+    outfile<<"-- total number of preemptions : "<< premptions <<std::endl;
+    outfile<<"-- CPU utilization: " <<std::fixed<< std::setprecision(3)<<cpuUtil<<"%"<<std::endl;
+    outfile.close();
 }
