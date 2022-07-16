@@ -843,6 +843,8 @@ void srt(std::vector<Process> &processes, int contexttime, double alpha, double 
 
 // round robin
 void rr(std::vector<Process>& processes, int contexttime, int tslice) {
+    std::ofstream outfile;
+    outfile.open("simout.txt", std::ios::app);
     // std::cout << "beginning of RR process" << std::endl;
     // variable declaration
     int currtime = 0;
@@ -852,8 +854,15 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
     bool prempted = false;
     int n = processes.size(); // the amount of processes
     int premptions = 0; // keeps track of number of premptions
+    int totalcputime = 0;
+    int contextSwitches = 0;
+    int totalwaittime = 0;
+    int totalwaits = 0;
+    bool contextflag = false;
+    int preemptions = 0;
+    int contexttimer = 0;
 
-    std::pair<int, char> wait[n];
+    // std::pair<int, char> wait[n];
     std::vector<Process> ioState; //process objects in ioState
     std::vector<Process> readyState; // Process objects in readyState do not reference the same objects as those in the processes argument, it is just a copy
     std::vector<Process> runState;//vector container for holding only one process to keep the same modification methods
