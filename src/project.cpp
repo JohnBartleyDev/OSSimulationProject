@@ -831,10 +831,8 @@ void srt(std::vector<Process> &processes, int contexttime, double alpha, double 
 }
 
 // round robin
-// adding basic set up for individual algorithms
-// add variables as needed
 void rr(std::vector<Process>& processes, int contexttime, int tslice) {
-    std::cout << "beginning of RR process" << std::endl;
+    // std::cout << "beginning of RR process" << std::endl;
     // variable declaration
     int currtime = 0;
     int currtslice = 0; // current slice being used
@@ -861,10 +859,11 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
         arrivalarr[i].second=processes[i].getID();
         //blocked.push_back(false); 
     }
+
+    // sorts by arrival time
     std::sort(arrivalarr, arrivalarr+n, compareArrival);
 
-
-    currtslice += tslice;
+    currtslice += tslice; // updates currtslice so it includes first valid section
 
     //uses burst to begin ready state
     int startsreached = 0;
@@ -884,6 +883,7 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
             }
         }
 
+        // checks for premption
         prempted = rrPrempted(readyState, currtime, runState[0].getID(), runState[0].getCurIO(), currtslice);
 
         if (prempted == true) {
@@ -935,8 +935,7 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
                 }
 
                 // if its possible to print
-                // probably need to change to a bigger value
-                if(currtime<= 999){
+                if(currtime <= 999){
                     std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" completed a CPU burst; "<<runState[0].getLen()-runState[0].getCur()-1 <<"bursts to go "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
                 }
                 currtime += contexttime/2;
@@ -975,8 +974,6 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
             
         }
 
-       
-        
         // ends entire simulation
         if(ioState.size()==0 && readyState.size()==0 && runState.size()==0 &&startsreached ==n){
             std::cout << "time " << currtime << "ms: Simulator ended for RR" << std::endl;
