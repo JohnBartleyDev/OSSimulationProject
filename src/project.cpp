@@ -486,7 +486,7 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
 
                 // outputs process time
                 if(1000>=currtime){
-                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" (tau "<<runState[0].getTau()<<") started using the CPU for "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
+                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" (tau "<<runState[0].getTau()<<"ms) started using the CPU for "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
                 }
                 contextSwitches +=1;
                 inuse= true;
@@ -553,7 +553,7 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
                     switchVectorsjf(ioState, readyState, ioState[i].getID());
 
                     if(1000>=currtime){
-                        std::cout<<"time "<<currtime<<"ms: Process "<<id<<" (tau " <<taul<<") completed I/O; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
+                        std::cout<<"time "<<currtime<<"ms: Process "<<id<<" (tau " <<taul<<"ms) completed I/O; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
                     }
                     
                     if (checkforduplicates(ioState, currtime) == true){
@@ -691,7 +691,7 @@ void srt(std::vector<Process> &processes, int contexttime, double alpha, double 
                 switchVector(readyState, runState, readyState[0].getID());
                 if (1000 >= currtime)
                 {
-                    std::cout << "time " << currtime << "ms: Process " << runState[0].getID() << " (tau " << runState[0].getTau() << ") started using the CPU for " << runState[0].getCurCPU() << "ms burst [Q:" << printQueue(readyState) << std::endl;
+                    std::cout << "time " << currtime << "ms: Process " << runState[0].getID() << " (tau " << runState[0].getTau() << "ms) started using the CPU for " << runState[0].getCurCPU() << "ms burst [Q:" << printQueue(readyState) << std::endl;
                 }
                 contextSwitches += 1;
                 inuse = true;
@@ -769,7 +769,7 @@ void srt(std::vector<Process> &processes, int contexttime, double alpha, double 
                     switchVectorsjf(ioState, readyState, ioState[i].getID());
                     if (1000 >= currtime)
                     {
-                        std::cout << "time " << currtime << "ms: Process " << id << " (tau " << taul << ") completed I/O; added to ready queue [Q:" << printQueue(readyState) << std::endl;
+                        std::cout << "time " << currtime << "ms: Process " << id << " (tau " << taul << "ms) completed I/O; added to ready queue [Q:" << printQueue(readyState) << std::endl;
                     }
 
                     if (checkforduplicates(ioState, currtime) == true)
