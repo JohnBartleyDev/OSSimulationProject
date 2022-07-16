@@ -662,7 +662,7 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
     std::vector<Process>::iterator readyit;
     std::vector<Process>::iterator ioit;
     std::vector<int> eventlog;
-    std::vector<bool> blocked;
+    //std::vector<bool> blocked;
 
     //sorts and creates order for initial ready queue for processes
     std::pair<int, char> arrivalarr[n];
@@ -671,7 +671,7 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
     for(int i = 0; i< n; i++){
         arrivalarr[i].first=processes[i].getArrival();
         arrivalarr[i].second=processes[i].getID();
-        blocked.push_back(false); 
+        //blocked.push_back(false); 
     }
     std::sort(arrivalarr, arrivalarr+n, compareArrival);
 
@@ -758,11 +758,9 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
                 // if nextIO for currID is too far, should block until next occurance
                 if (runState[0].getNextIO() > currslice + 2 * tslice) {
                     // can use bool[] to check if something is blocked or not
-                    blocked[std::atoi((runState[0].getID()))] = true;
+                    //blocked[std::atoi((runState[0].getID()))] = true;
                     std::cout << "time " << currtime << ": Process " << runState[0].getID() << " switching out of CPU; will block on I/O until time " << runState[0].getNextIO() << "ms " << printQueue(readyState) << std::endl;
-                } else {
-                    blocked[std::atoi((runState[0].getID()))] = false;
-                }
+                } 
                 
                 runState[0].nextP();
                 switchVector(runState, ioState, runState[0].getID());
