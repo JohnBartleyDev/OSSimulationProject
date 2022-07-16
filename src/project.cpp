@@ -862,9 +862,8 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
     int contextSwitches = 0;
     int totalwaittime = 0;
     int totalwaits = 0;
-    bool contextflag = false;
-    int preemptions = 0;
-    int contexttimer = 0;
+    //bool contextflag = false;
+    //int contexttimer = 0;
 
     // std::pair<int, char> wait[n];
     std::vector<Process> ioState; //process objects in ioState
@@ -969,7 +968,7 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
                 runState[0].addIOevent(runState[0].getCurIO()+currtime);
 
                 // if nextIO for currID is too far, should block until next occurance
-                if (runState[0].getNextIO() > currslice + 2 * tslice) {
+                if (runState[0].getNextIO() > currtslice + 2 * tslice) {
                     // can use bool[] to check if something is blocked or not
                     //blocked[std::atoi((runState[0].getID()))] = true;
                     std::cout << "time " << currtime << ": Process " << runState[0].getID() << " switching out of CPU; will block on I/O until time " << runState[0].getNextIO() << "ms " << printQueue(readyState) << std::endl;
