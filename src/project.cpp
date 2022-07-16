@@ -357,7 +357,7 @@ void fcfs(std::vector<Process>& processes, int contexttime) {
                 
                 // if process has been terminated
                 if(runState[0].getLen()-runState[0].getCur() <=1){
-                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" Terminated [Q:"<<printQueue(readyState)<<std::endl;
+                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" terminated [Q:"<<printQueue(readyState)<<std::endl;
                     totalcputime += runState[0].getAvgBurst()+runState[0].getCurCPU();
                     totalwaits +=runState[0].getWaits();
                     runState.erase(runState.begin());
@@ -420,6 +420,7 @@ void fcfs(std::vector<Process>& processes, int contexttime) {
     outfile << "-- average CPU burst time: " << std::fixed << std::setprecision(3) << avgBurst << " ms" << std::endl;
     outfile << "-- average wait time: " << std::fixed << std::setprecision(3) << avgWait << " ms" << std::endl;
     outfile << "-- average turnaround time: " << std::fixed << std::setprecision(3) << avgWait + avgBurst + contexttime << " ms" << std::endl;
+    outfile << "-- total number of context switches: " << contextSwitches << std::endl;
     outfile << "-- total number of preemptions : 0" << std::endl;
     outfile << "-- CPU utilization: " << std::fixed << std::setprecision(3) << cpuUtil << "%" << std::endl;
     outfile.close();
@@ -463,7 +464,7 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
    
     //uses sorted epected burst time to begin ready state
     int startsreached =0;
-    std::cout<<"time "<<currtime<<"ms: Simulator started for FCFS [Q:"<<printQueue(readyState)<<std::endl;
+    std::cout<<"time "<<currtime<<"ms: Simulator started for SJF [Q:"<<printQueue(readyState)<<std::endl;
     while(inprocess){
         if(contextflag == true){
             contexttimer -=1;
@@ -497,7 +498,7 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
             if(currtime >= runState[0].getNextIO()){
                 // process has terminated
                 if(runState[0].getLen()-runState[0].getCur() <=1){
-                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" Terminated [Q:"<<printQueue(readyState)<<std::endl;
+                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" terminated [Q:"<<printQueue(readyState)<<std::endl;
                     totalcputime += runState[0].getAvgBurst()+runState[0].getCurCPU();
                     totalwaits +=runState[0].getWaits();
                     runState.erase(runState.begin());
@@ -615,10 +616,11 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
     //std::cout<<totalwaits<<" "<<totalwaittime<<" " <<std::setprecision(5)<<avgWait<<std::endl;
     double cpuUtil =100*(1-((double)(currtime-totalcputime-totalwaittime)/(double)currtime));
     //std::cout<<avgWait<<std::endl;
-    outfile <<"Algorithm FCFS\n";
+    outfile <<"Algorithm SJF\n";
     outfile<<"-- average CPU burst time: " <<std::fixed<< std::setprecision(3)<<avgBurst<<" ms"<<std::endl;
     outfile<<"-- average wait time: " <<std::fixed<< std::setprecision(3)<<avgWait<<" ms"<<std::endl;
     outfile<<"-- average turnaround time: " <<std::fixed<< std::setprecision(3)<<avgWait+avgBurst+contexttime<<" ms"<<std::endl;
+    outfile << "-- total number of context switches: " << contextSwitches << std::endl;
     outfile<<"-- total number of preemptions : 0" <<std::endl;
     outfile<<"-- CPU utilization: " <<std::fixed<< std::setprecision(3)<<cpuUtil<<"%"<<std::endl;
     outfile.close();
@@ -666,7 +668,7 @@ void srt(std::vector<Process> &processes, int contexttime, double alpha, double 
 
     // uses sorted arrival time to begin ready state
     int startsreached = 0;
-    std::cout << "time " << currtime << "ms: Simulator started for FCFS [Q:" << printQueue(readyState) << std::endl;
+    std::cout << "time " << currtime << "ms: Simulator started for SRT [Q:" << printQueue(readyState) << std::endl;
     while (inprocess) //loop that continues until all queues are empty and the simulation has ended
     {
         if (contextflag == true)
@@ -702,7 +704,7 @@ void srt(std::vector<Process> &processes, int contexttime, double alpha, double 
 
                 if (runState[0].getLen() - runState[0].getCur() <= 1)
                 {
-                    std::cout << "time " << currtime << "ms: Process " << runState[0].getID() << " Terminated [Q:" << printQueue(readyState) << std::endl;
+                    std::cout << "time " << currtime << "ms: Process " << runState[0].getID() << " terminated [Q:" << printQueue(readyState) << std::endl;
                     totalcputime += runState[0].getAvgBurst() + runState[0].getCurCPU();
                     totalwaits += runState[0].getWaits();
                     runState.erase(runState.begin());
@@ -836,10 +838,11 @@ void srt(std::vector<Process> &processes, int contexttime, double alpha, double 
     // std::cout<<totalwaits<<" "<<totalwaittime<<" " <<std::setprecision(5)<<avgWait<<std::endl;
     double cpuUtil = 100 * (1 - ((double)(currtime - totalcputime - totalwaittime) / (double)currtime));
     // std::cout<<avgWait<<std::endl;
-    outfile << "Algorithm FCFS\n";
+    outfile << "Algorithm SRT\n";
     outfile << "-- average CPU burst time: " << std::fixed << std::setprecision(3) << avgBurst << " ms" << std::endl;
     outfile << "-- average wait time: " << std::fixed << std::setprecision(3) << avgWait << " ms" << std::endl;
     outfile << "-- average turnaround time: " << std::fixed << std::setprecision(3) << avgWait + avgBurst + contexttime << " ms" << std::endl;
+    outfile << "-- total number of context switches: " << contextSwitches << std::endl;
     outfile << "-- total number of preemptions : " << preemptions << std::endl;
     outfile << "-- CPU utilization: " << std::fixed << std::setprecision(3) << cpuUtil << "%" << std::endl;
     outfile.close();
@@ -891,6 +894,7 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
 
     //uses burst to begin ready state
     int startsreached = 0;
+    std::cout<<"time "<<currtime<<"ms: Simulator started for RR [Q:"<<printQueue(readyState)<<std::endl;
     while (inprocess) {
         // must add process back into queue if it does not meet timeslice
         if(startsreached < n){
@@ -948,7 +952,7 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
                 
                 // process terminated and can be removed from queue
                 if(runState[0].getLen()-runState[0].getCur() <=1){
-                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" Terminated [Q:"<<printQueue(readyState)<<std::endl;
+                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" terminated [Q:"<<printQueue(readyState)<<std::endl;
                     totalcputime += runState[0].getAvgBurst()+runState[0].getCurCPU();
                     totalwaits +=runState[0].getWaits();
                     runState.erase(runState.begin()); 
@@ -1027,6 +1031,7 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
     outfile<<"-- average CPU burst time: " <<std::fixed<< std::setprecision(3)<<avgBurst<<" ms"<<std::endl;
     outfile<<"-- average wait time: " <<std::fixed<< std::setprecision(3)<<avgWait<<" ms"<<std::endl;
     outfile<<"-- average turnaround time: " <<std::fixed<< std::setprecision(3)<<avgWait+avgBurst+contexttime<<" ms"<<std::endl;
+    outfile << "-- total number of context switches: " << contextSwitches << std::endl;
     outfile<<"-- total number of preemptions : "<< premptions <<std::endl;
     outfile<<"-- CPU utilization: " <<std::fixed<< std::setprecision(3)<<cpuUtil<<"%"<<std::endl;
     outfile.close();
