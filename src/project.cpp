@@ -645,6 +645,7 @@ void srt(std::vector<Process> &processes, int contexttime, double alpha, double 
     int totalwaittime = 0;
     int totalwaits = 0;
     bool contextflag = false;
+    int preemptions = 0;
     int contexttimer = 0;
 
     std::vector<Process> ioState;    // process objects in ioState
@@ -711,6 +712,16 @@ void srt(std::vector<Process> &processes, int contexttime, double alpha, double 
                     contexttimer = contexttime / 2;
                     // std::cout<<"time "<<currtime<<"ms: going to contextswitch from emptyprocess"<<std::endl;
                     goto srtcontextswitch;
+                } else {
+                    //process has not ended, check for preemption
+                    int cRem = runState[0].getLen() - runState[0].getCur();
+                    int nRem //look at estimated cpu time of the process whose io just finished
+                    if (cRem > nRem) //if new process is quicker, perform a preemption
+                    {
+                        preemptions++;
+                        //put current process at the end of the ready block
+                        //put
+                    }
                 }
                 if (1000 >= currtime)
                 {
@@ -825,7 +836,7 @@ void srt(std::vector<Process> &processes, int contexttime, double alpha, double 
     outfile << "-- average CPU burst time: " << std::fixed << std::setprecision(3) << avgBurst << " ms" << std::endl;
     outfile << "-- average wait time: " << std::fixed << std::setprecision(3) << avgWait << " ms" << std::endl;
     outfile << "-- average turnaround time: " << std::fixed << std::setprecision(3) << avgWait + avgBurst + contexttime << " ms" << std::endl;
-    outfile << "-- total number of preemptions : 0" << std::endl;
+    outfile << "-- total number of preemptions : " << preemptions << std::endl;
     outfile << "-- CPU utilization: " << std::fixed << std::setprecision(3) << cpuUtil << "%" << std::endl;
     outfile.close();
 }
