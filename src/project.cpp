@@ -981,7 +981,7 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
                 if (runState[0].getNextIO() > currtslice + 2 * tslice) {
                     // can use bool[] to check if something is blocked or not
                     //blocked[std::atoi((runState[0].getID()))] = true;
-                    std::cout << "time " << currtime << ": Process " << runState[0].getID() << " switching out of CPU; will block on I/O until time " << runState[0].getNextIO() << "ms " << printQueue(readyState) << std::endl;
+                    std::cout << "time " << currtime << ": Process " << runState[0].getID() << " switching out of CPU; will block on I/O until time " << runState[0].getNextIO() << "ms [Q:" << printQueue(readyState) << std::endl;
                 } 
                 
                 runState[0].nextP();
