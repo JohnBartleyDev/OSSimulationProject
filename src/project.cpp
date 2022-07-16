@@ -112,7 +112,7 @@ int main(int argc, char** argv){
         }
         int cpuTime = ceil(1+next_exp(lambda, randomMax));
         processes.back().addTime(cpuTime);
-            std::cout << "--> CPU burst " << cpuTime << "ms "<< std::endl;
+            std::cout << "--> CPU burst " << cpuTime << "ms"<< std::endl;
 
         
     }
