@@ -662,6 +662,7 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
     std::vector<Process>::iterator readyit;
     std::vector<Process>::iterator ioit;
     std::vector<int> eventlog;
+    std::vector<bool> blocked;
 
     //sorts and creates order for initial ready queue for processes
     std::pair<int, char> arrivalarr[n];
@@ -670,8 +671,10 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
     for(int i = 0; i< n; i++){
         arrivalarr[i].first=processes[i].getArrival();
         arrivalarr[i].second=processes[i].getID();
+        blocked.push_back(false); 
     }
     std::sort(arrivalarr, arrivalarr+n, compareArrival);
+
 
     currtslice += tslice;
 
@@ -693,24 +696,19 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
             }
         }
 
-        // updates currtslice
-        if (currtslice < currtime) {
-            currtslice += tslice;
-        }
-
         prempted = rrPrempted(readyState, currtime, runState[0].getID(), runState[0].getCurIO(), currtslice);
 
-            if (prempted == true) {
-                // go to next value
-                prempted = false;
-                goto cnt;
-                // continue;
-            }
+        if (prempted == true) {
+            // go to next value
+            prempted = false;
+            goto cnt;
+            // continue;
+        }
 
-       
+       // when CPU is not in use
        if (inuse == false){
             
-
+            // if there are more processes stored in queue
             if(readyState.size()!=0){
                 totalwaittime += currtime - readyState[0].getWait();
                 currtime += contexttime/2;
@@ -730,21 +728,26 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
             }
         }
         
+        // when the CPU is being used
         if(inuse == true) {
+            // process is printable 
             if(currtime >= runState[0].getNextIO()){
                 
-                
+                // process terminated and can be removed from queue
                 if(runState[0].getLen()-runState[0].getCur() <=1){
                     std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" Terminated [Q:"<<printQueue(readyState)<<std::endl;
                     totalcputime += runState[0].getAvgBurst()+runState[0].getCurCPU();
                     totalwaits +=runState[0].getWaits();
-                    // runState.erase(runState.begin()); --> need to add premption
+                    runState.erase(runState.begin()); 
 
                     inuse = false;
                     
                     currtime +=contexttime/2;
                     continue;
                 }
+
+                // if its possible to print
+                // probably need to change to a bigger value
                 if(currtime<= 999){
                     std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" completed a CPU burst; "<<runState[0].getLen()-runState[0].getCur()-1 <<"bursts to go "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
                 }
@@ -761,6 +764,8 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
                 continue;
             }
         }
+
+        // when there is nothing else to be run for the current process
         if(ioState.size()!= 0){
             for (int i = 0; i< int(ioState.size()); i++){
                 if(currtime >= ioState[i].getNextIO()){
@@ -774,7 +779,10 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
             }
             
         }
+
+       
         
+        // ends entire simulation
         if(ioState.size()==0 && readyState.size()==0 && runState.size()==0 &&startsreached ==n){
             std::cout << "time " << currtime << "ms: Simulator ended for RR" << std::endl;
             inprocess =false;
@@ -784,5 +792,17 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
         prempted = false;
         currtime+=1;
         cnt:;
+
+        // updates currtslice
+        if (currtslice < currtime) {
+            currtslice += tslice;
+        }
+
+        // if nextIO is too far, should block until next occurance
+        if () {
+            // can use bool[] to check if something is blocked or not
+            // false --> can use
+            // true --> blocked
+        }
     }
 }
