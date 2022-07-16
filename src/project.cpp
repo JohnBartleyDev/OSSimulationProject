@@ -137,9 +137,11 @@ int main(int argc, char** argv){
             break;
         case 2:
             algorithm = "SRT";
+            srt(processes, csTime, alpha, lambda);
             break;
         case 3:
             algorithm = "RR";
+            rr(processes, csTime, timeSlice);
             break;
         }
         //do algorithm
