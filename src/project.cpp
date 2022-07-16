@@ -697,7 +697,7 @@ void srt(std::vector<Process> &processes, int contexttime, double alpha, double 
 
         if (inuse == true) //currently in use
         {
-            if (currtime >= runState[0].getNextIO())
+            if (currtime >= runState[0].getNextIO()) //earliest IO burst has ended
             {
 
                 if (runState[0].getLen() - runState[0].getCur() <= 1)
@@ -715,12 +715,16 @@ void srt(std::vector<Process> &processes, int contexttime, double alpha, double 
                 } else {
                     //process has not ended, check for preemption
                     int cRem = runState[0].getLen() - runState[0].getCur();
-                    int nRem //look at estimated cpu time of the process whose io just finished
+                    int nRem = 1000000; //look at estimated cpu time of the process whose io just finished //TODO: get this correctly
                     if (cRem > nRem) //if new process is quicker, perform a preemption
                     {
                         preemptions++;
                         //put current process at the end of the ready block
-                        //put
+
+                        //delete current instance of process
+
+                        //put new process on current
+                        goto srtcontextswitch; //rely on srtcontextswitch to handle switching in this new time, which is the shortest job
                     }
                 }
                 if (1000 >= currtime)
