@@ -285,20 +285,16 @@ bool rrPrempted(std::vector<Process> readyState, int currtime, char ID, int curr
 }
 
 // first come first serve
-// adding basic set up for individual algorithms
-// add variables as needed
 void fcfs(std::vector<Process>& processes, int contexttime) {
-
-    
     std::ofstream outfile;
     outfile.open("simout.txt", std::ios::app);
     
     //variable declarations
     int currtime = 0;
     bool inprocess = true; //turns false when there are no processes in the ready, running, or waiting state 
-    bool inuse =false;
+    bool inuse = false;
     int n = processes.size(); //the amount of processes
-    int totalcputime =0;
+    int totalcputime = 0;
     int contextSwitches = 0;
     int totalwaittime = 0;
     int totalwaits = 0;
@@ -312,7 +308,7 @@ void fcfs(std::vector<Process>& processes, int contexttime) {
     //sorts and creates order for initial ready queue for processes
     std::pair<int, char> arrivalarr[n];
     
-    
+    // udates arrivalarr to hold all processes
     for(int i = 0; i< n; i++){
         arrivalarr[i].first=processes[i].getArrival();
         arrivalarr[i].second=processes[i].getID();
@@ -320,96 +316,98 @@ void fcfs(std::vector<Process>& processes, int contexttime) {
     std::sort(arrivalarr, arrivalarr+n, compareArrival);
    
     //uses sorted arrival time to begin ready state
-    int startsreached =0;
-     std::cout<<"time "<<currtime<<"ms: Simulator started for FCFS [Q:"<<printQueue(readyState)<<std::endl;
-        while(inprocess){
-            if(startsreached < n){
-                if(currtime >= arrivalarr[startsreached].first){
-                    ioit =std::find_if(processes.begin(), processes.end(), std::bind(compareProcess, std::placeholders::_1, arrivalarr[startsreached].second));
-                    readyState.push_back(*ioit);
-                    startsreached +=1;
-                    if(currtime<= 999){
-                        std::cout<<"time "<<currtime<<"ms: Process "<<readyState[readyState.size()-1].getID()<<" arrived; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
-                    }
-                     
-                     continue;
-
-                }
-            }
-           
-           if (inuse == false){
-                if(readyState.size()!=0){
-                    totalwaittime += currtime -readyState[0].getWait();
-                    currtime += contexttime/2;
-                   
-                    
-                   
-                    switchVector(readyState, runState, readyState[0].getID());
-                     if(currtime<= 999){
-                        std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" started using the CPU for "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
-                    }
-                    contextSwitches +=1;
-                    inuse= true;
-                    
-                   
-                    runState[0].addIOevent(runState[0].getCurCPU()+currtime);
+    int startsreached = 0;
+    std::cout<<"time "<<currtime<<"ms: Simulator started for FCFS [Q:"<<printQueue(readyState)<<std::endl;
+    while(inprocess) {
+        // begins the process_n
+        if(startsreached < n){
+            if(currtime >= arrivalarr[startsreached].first){
+                ioit =std::find_if(processes.begin(), processes.end(), std::bind(compareProcess, std::placeholders::_1, arrivalarr[startsreached].second));
+                readyState.push_back(*ioit);
+                startsreached +=1;
+                if(currtime<= 999){
+                    std::cout<<"time "<<currtime<<"ms: Process "<<readyState[readyState.size()-1].getID()<<" arrived; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
+                }  
                     continue;
-                }
             }
-            
-            if(inuse == true) {
-                if(currtime >= runState[0].getNextIO()){
-                    
-                    
-                    if(runState[0].getLen()-runState[0].getCur() <=1){
-                        std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" Terminated [Q:"<<printQueue(readyState)<<std::endl;
-                        totalcputime += runState[0].getAvgBurst()+runState[0].getCurCPU();
-                        totalwaits +=runState[0].getWaits();
-                        runState.erase(runState.begin());
-                        inuse = false;
-                        
-                        currtime +=contexttime/2;
-                        continue;
-                    }
-                    if(currtime<= 999){
-                        std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" completed a CPU burst; "<<runState[0].getLen()-runState[0].getCur()-1 <<"bursts to go "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
-                    }
-                    currtime += contexttime/2;
-                    
-                    runState[0].addIOevent(runState[0].getCurIO()+currtime);
-                    
-                    runState[0].nextP();
-                    switchVector(runState, ioState, runState[0].getID());
-                    
-                    
-                    inuse = false;
-                    
-                    continue;
-                }
-            }
-            if(ioState.size()!= 0){
-                for (int i = 0; i< int(ioState.size()); i++){
-                    if(currtime >= ioState[i].getNextIO()){
-                        ioState[i].setWait(currtime);
-                        switchVector(ioState, readyState, ioState[i].getID());
-                        if(currtime<= 999){
-                            std::cout<<"time "<<currtime<<"ms: Process "<<readyState[readyState.size()-1].getID()<<" completed I/O; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
-                        }
-                        goto cnt;
-                    }
-                }
+        }
+        
+        // when CPU is not in use
+        if (inuse == false){
+            // when there is something in readyState queue
+            if(readyState.size()!=0){
+                totalwaittime += currtime -readyState[0].getWait();
+                currtime += contexttime/2;
                 
-            }
-            
-            if(ioState.size()==0 && readyState.size()==0 && runState.size()==0 &&startsreached ==n){
-                std::cout << "time "<<currtime<<"ms: Simulator ended for FCFS" << std::endl;
-                inprocess =false;
+                switchVector(readyState, runState, readyState[0].getID());
+                if(currtime <= 999){
+                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" started using the CPU for "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
+                }
+                contextSwitches +=1;
+                inuse = true;
+                
+                runState[0].addIOevent(runState[0].getCurCPU()+currtime);
                 continue;
             }
-          
+        }
+        
+        // when CPU is in use
+        if(inuse == true) {
+            if(currtime >= runState[0].getNextIO()){
+                
+                // if process has been terminated
+                if(runState[0].getLen()-runState[0].getCur() <=1){
+                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" Terminated [Q:"<<printQueue(readyState)<<std::endl;
+                    totalcputime += runState[0].getAvgBurst()+runState[0].getCurCPU();
+                    totalwaits +=runState[0].getWaits();
+                    runState.erase(runState.begin());
+                    inuse = false;
+                    
+                    currtime +=contexttime/2;
+                    continue;
+                }
+
+                // output complete CPU burst
+                if(currtime<= 999){
+                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" completed a CPU burst; "<<runState[0].getLen()-runState[0].getCur()-1 <<"bursts to go "<<runState[0].getCurCPU()<<"ms burst [Q:"<<printQueue(readyState)<<std::endl;
+                }
+                currtime += contexttime/2;
+                
+                runState[0].addIOevent(runState[0].getCurIO()+currtime);
+                
+                runState[0].nextP();
+                switchVector(runState, ioState, runState[0].getID());
             
-            currtime+=1;
-            cnt:;
+                inuse = false;
+                
+                continue;
+            }
+        }
+
+        // if there is no more IO, complete IO process 
+        if(ioState.size()!= 0){
+            for (int i = 0; i< int(ioState.size()); i++){
+                if(currtime >= ioState[i].getNextIO()){
+                    ioState[i].setWait(currtime);
+                    switchVector(ioState, readyState, ioState[i].getID());
+                    if(currtime<= 999){
+                        std::cout<<"time "<<currtime<<"ms: Process "<<readyState[readyState.size()-1].getID()<<" completed I/O; added to ready queue [Q:"<<printQueue(readyState)<<std::endl;
+                    }
+                    goto cnt;
+                }
+            }
+            
+        }
+        
+        // simulator ends
+        if(ioState.size()==0 && readyState.size()==0 && runState.size()==0 &&startsreached ==n){
+            std::cout << "time "<<currtime<<"ms: Simulator ended for FCFS" << std::endl;
+            inprocess =false;
+            continue;
+        }
+        
+        currtime+=1;
+        cnt:;
     }
     double avgBurst = (double)totalcputime/(double)contextSwitches;
     //std::cout<<totalcputime<<" "<<contextSwitches<<" " <<std::setprecision(5)<<avgBurst<<std::endl;
