@@ -123,6 +123,7 @@ int main(int argc, char** argv){
     {
         std::cout<<std::endl;
         //reseed(inputSeed);
+        srand48(inputSeed);
         
         std::string algorithm;
         switch (alg)
