@@ -754,6 +754,15 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
                 currtime += contexttime/2;
                 
                 runState[0].addIOevent(runState[0].getCurIO()+currtime);
+
+                // if nextIO for currID is too far, should block until next occurance
+                if (runState[0].getNextIO() > currslice + 2 * tslice) {
+                    // can use bool[] to check if something is blocked or not
+                    blocked[std::atoi((runState[0].getID()))] = true;
+                    std::cout << "time " << currtime << ": Process " << runState[0].getID() << " switching out of CPU; will block on I/O until time " << runState[0].getNextIO() << "ms " << printQueue(readyState) << std::endl;
+                } else {
+                    blocked[std::atoi((runState[0].getID()))] = false;
+                }
                 
                 runState[0].nextP();
                 switchVector(runState, ioState, runState[0].getID());
@@ -796,13 +805,6 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
         // updates currtslice
         if (currtslice < currtime) {
             currtslice += tslice;
-        }
-
-        // if nextIO is too far, should block until next occurance
-        if () {
-            // can use bool[] to check if something is blocked or not
-            // false --> can use
-            // true --> blocked
         }
     }
 }
