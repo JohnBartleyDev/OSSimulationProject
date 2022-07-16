@@ -373,7 +373,7 @@ void fcfs(std::vector<Process>& processes, int contexttime) {
                 // output complete CPU burst
                 if(currtime<= 999){
                     std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" completed a CPU burst; "<<runState[0].getLen()-runState[0].getCur()-1 <<" bursts to go [Q:"<<printQueue(readyState)<<std::endl;
-                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" switching out of CPU; will block I/O until time "<<runState[0].getCurIO()+(currtime+contexttime/2) <<"ms [Q:"<<printQueue(readyState)<<std::endl;
+                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" switching out of CPU; will block on I/O until time "<<runState[0].getCurIO()+(currtime+contexttime/2) <<"ms [Q:"<<printQueue(readyState)<<std::endl;
                 }
                 currtime += contexttime/2;
                 
@@ -516,7 +516,7 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
                 // process can be outpputed
                 if(1000>=currtime){
                     std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" completed a CPU burst; "<<runState[0].getLen()-runState[0].getCur()-1 <<" bursts to go [Q:"<<printQueue(readyState)<<std::endl;
-                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" switching out of CPU; will block I/O until time "<<runState[0].getCurIO()+(currtime+contexttime/2) <<"ms [Q:"<<printQueue(readyState)<<std::endl;
+                    std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" switching out of CPU; will block on I/O until time "<<runState[0].getCurIO()+(currtime+contexttime/2) <<"ms [Q:"<<printQueue(readyState)<<std::endl;
                 }
                 
                 // updates runState for next burst
@@ -736,7 +736,7 @@ void srt(std::vector<Process> &processes, int contexttime, double alpha, double 
                 if (1000 >= currtime)
                 {
                     std::cout<<"time "<<currtime<<"ms: Process "<<runState[0].getID()<<" completed a CPU burst; "<<runState[0].getLen()-runState[0].getCur()-1 <<" bursts to go [Q:"<<printQueue(readyState)<<std::endl;
-                    std::cout << "time " << currtime << "ms: Process " << runState[0].getID() << " switching out of CPU; will block I/O until time " << runState[0].getCurIO() + (currtime + contexttime / 2) << "ms [Q:" << printQueue(readyState) << std::endl;
+                    std::cout << "time " << currtime << "ms: Process " << runState[0].getID() << " switching out of CPU; will block on I/O until time " << runState[0].getCurIO() + (currtime + contexttime / 2) << "ms [Q:" << printQueue(readyState) << std::endl;
                 }
 
                 runState[0].addIOevent(runState[0].getCurIO() + currtime + contexttime / 2);
