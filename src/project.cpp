@@ -405,7 +405,7 @@ void fcfs(std::vector<Process>& processes, int contexttime) {
         
         // simulator ends
         if(ioState.size()==0 && readyState.size()==0 && runState.size()==0 &&startsreached ==n){
-            std::cout << "time "<<currtime<<"ms: Simulator ended for FCFS" << std::endl;
+            std::cout << "time "<<currtime<<"ms: Simulator ended for FCFS [Q:"<<  printQueue(readyState) << std::endl;
             inprocess =false;
             continue;
         }
@@ -595,7 +595,7 @@ void sjf(std::vector<Process>& processes, int contexttime, double alpha, double 
         
         // ends process
         if(ioState.size()==0 && readyState.size()==0 && runState.size()==0 &&startsreached ==n){
-            std::cout << "time "<<currtime+contexttime/2<<"ms: Simulator ended for SJF" << std::endl;
+            std::cout << "time "<<currtime+contexttime/2<<"ms: Simulator ended for SJF [Q:"<< printQueue(readyState) << std::endl;
             inprocess =false;
             continue;
         }
@@ -816,7 +816,7 @@ void srt(std::vector<Process> &processes, int contexttime, double alpha, double 
 
         if (ioState.size() == 0 && readyState.size() == 0 && runState.size() == 0 && startsreached == n)
         {
-            std::cout << "time " << currtime + contexttime / 2 << "ms: Simulator ended for SRT" << std::endl;
+            std::cout << "time " << currtime + contexttime / 2 << "ms: Simulator ended for SRT [Q:" << printQueue(readyState) << std::endl;
             inprocess = false;
             continue;
         }
@@ -981,7 +981,7 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
                 if (runState[0].getNextIO() > currtslice + 2 * tslice) {
                     // can use bool[] to check if something is blocked or not
                     //blocked[std::atoi((runState[0].getID()))] = true;
-                    std::cout << "time " << currtime << ": Process " << runState[0].getID() << " switching out of CPU; will block on I/O until time " << runState[0].getNextIO() << "ms " << printQueue(readyState) << std::endl;
+                    std::cout << "time " << currtime << ": Process " << runState[0].getID() << " switching out of CPU; will block on I/O until time " << runState[0].getNextIO() << "ms [Q:" << printQueue(readyState) << std::endl;
                 } 
                 
                 runState[0].nextP();
@@ -1011,7 +1011,7 @@ void rr(std::vector<Process>& processes, int contexttime, int tslice) {
 
         // ends entire simulation
         if(ioState.size()==0 && readyState.size()==0 && runState.size()==0 &&startsreached ==n){
-            std::cout << "time " << currtime << "ms: Simulator ended for RR" << std::endl;
+            std::cout << "time " << currtime << "ms: Simulator ended for RR [Q:"<<  printQueue(readyState) << std::endl;
             inprocess =false;
             continue;
         }
